@@ -7,6 +7,7 @@ import { puckConfig } from "@/lib/puck/config";
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { AIChatSidebar } from "@/components/AIChatSidebar";
 import { ExportHTMLModal } from "@/components/ExportHTMLModal";
+import { ColorPickerField } from "@/components/fields/ColorPickerField";
 
 const usePuck = createUsePuck();
 
@@ -346,50 +347,45 @@ export default function EditorPage() {
           onChange={handleChange}
           ui={{ rightSideBarVisible: false }}
           overrides={{
+            fieldTypes: {
+              text: ({ name, onChange, value, children }) => {
+                const isColor = /color|Color|backgroundColor/.test(name);
+                if (isColor) {
+                  return (
+                    <ColorPickerField
+                      value={value as string || ""}
+                      onChange={(v) => onChange(v)}
+                    />
+                  );
+                }
+                return <>{children}</>;
+              },
+            },
             headerActions: () => (
-              <div className="flex items-center gap-2">
-                {/* Save Button */}
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <button
                   onClick={handleManualSave}
                   disabled={!pageId || saveStatus === "saving"}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors"
                   style={{
+                    display: "flex", alignItems: "center", gap: "6px",
                     background: saveStatus === "saved" ? "#1a3a1a" : "#1A1A1A",
-                    color: saveStatus === "saved" ? "#4ade80" : "#CCC",
-                    border: "1px solid #333",
+                    color: saveStatus === "saved" ? "#4ade80" : "#FFFFFF",
+                    border: "1px solid #333", fontSize: "12px", padding: "6px 14px",
+                    borderRadius: "6px", cursor: "pointer", fontFamily: "var(--font-inter), sans-serif",
+                    opacity: !pageId ? 0.4 : 1,
                   }}
                 >
-                  {saveStatus === "saving" ? (
-                    <>
-                      <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
-                      Saving...
-                    </>
-                  ) : saveStatus === "saved" ? (
-                    <>
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Saved
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                      </svg>
-                      Save
-                    </>
-                  )}
+                  {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}
                 </button>
-
-                {/* Export HTML Button */}
                 <button
                   onClick={() => setShowExport(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors"
-                  style={{ background: "#1A1A1A", color: "#CCC", border: "1px solid #333" }}
+                  style={{
+                    display: "flex", alignItems: "center", gap: "6px",
+                    background: "#1A1A1A", color: "#FFFFFF", border: "1px solid #333",
+                    fontSize: "12px", padding: "6px 14px", borderRadius: "6px",
+                    cursor: "pointer", fontFamily: "var(--font-inter), sans-serif",
+                  }}
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                  </svg>
                   Export HTML
                 </button>
               </div>

@@ -1,23 +1,25 @@
-/* Dark theme overrides for Puck editor */
+/* ============================================
+   FRAMER-STYLE DARK THEME FOR PUCK EDITOR
+   ============================================ */
 
-/* Invert the grey scale for dark mode */
+/* --- CSS Custom Properties (Color System Override) --- */
 :root {
   --puck-color-grey-12: #0D0D0D;
   --puck-color-grey-11: #111111;
   --puck-color-grey-10: #1A1A1A;
   --puck-color-grey-09: #222222;
   --puck-color-grey-08: #2A2A2A;
-  --puck-color-grey-07: #3A3A3A;
+  --puck-color-grey-07: #333333;
   --puck-color-grey-06: #555555;
   --puck-color-grey-05: #666666;
-  --puck-color-grey-04: #999999;
+  --puck-color-grey-04: #888888;
   --puck-color-grey-03: #AAAAAA;
   --puck-color-grey-02: #CCCCCC;
   --puck-color-grey-01: #E8E8E8;
   --puck-color-white: #FFFFFF;
   --puck-color-black: #000000;
 
-  /* Azure accent - use a vivid purple/blue for selection */
+  /* Purple accent system */
   --puck-color-azure-04: #7C5CFC;
   --puck-color-azure-05: #7C5CFC;
   --puck-color-azure-06: #9B82FC;
@@ -29,72 +31,353 @@
   --puck-color-azure-12: #141020;
 }
 
-/* Canvas area - slightly lighter to distinguish from chrome */
-[class*="_PuckLayout_"] [class*="_PuckPreview_"],
-[class*="_PuckLayout_"] [class*="_PuckCanvas_"],
-[data-puck-preview] {
-  background-color: #141414 !important;
+/* ============================================
+   TOP TOOLBAR
+   ============================================ */
+[class*="_PuckHeader_"] {
+  background: #1A1A1A !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  border-bottom: 1px solid #2A2A2A !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
 
-/* Make sure text in sidebar fields is readable */
-[class*="_PuckFields_"] input,
-[class*="_PuckFields_"] textarea,
-[class*="_PuckFields_"] select {
-  background-color: #1A1A1A !important;
-  color: #E8E8E8 !important;
-  border-color: #333333 !important;
+/* Page title centered */
+[class*="_PuckHeader_"] h2 {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #FFFFFF !important;
 }
 
-/* Dropdown options */
-[class*="_PuckFields_"] select option {
-  background-color: #1A1A1A;
-  color: #E8E8E8;
+/* Undo/Redo buttons */
+[class*="_IconButton_"] {
+  width: 28px !important;
+  height: 28px !important;
+  background: transparent !important;
+  border-radius: 6px !important;
+  color: #888888 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
-/* Header / toolbar area */
-[class*="_PuckLayout-header_"],
-header[class*="_PuckLayout"] {
-  background-color: #0D0D0D !important;
-  border-color: #222222 !important;
+[class*="_IconButton_"]:hover:not([disabled]) {
+  background: #2A2A2A !important;
 }
 
-/* Sidebar panels */
-[class*="_PuckLayout-leftSideBar_"],
-[class*="_PuckLayout-rightSideBar_"] {
-  background-color: #111111 !important;
-  border-color: #222222 !important;
-}
-
-/* Component drawer items */
-[class*="_Drawer-item_"],
-[class*="_ComponentListItem_"] {
-  background-color: #1A1A1A !important;
-  border-color: #2A2A2A !important;
-  color: #E8E8E8 !important;
-}
-
-[class*="_Drawer-item_"]:hover,
-[class*="_ComponentListItem_"]:hover {
-  background-color: #222222 !important;
-}
-
-/* Category headers */
-[class*="_ComponentList-title_"] {
+[class*="_IconButton_"] svg {
+  width: 16px !important;
+  height: 16px !important;
   color: #888888 !important;
 }
 
-/* Buttons in toolbar */
-[class*="_IconButton_"] {
+[class*="_IconButton_"][disabled] {
+  opacity: 0.3 !important;
+}
+
+/* Publish button — style as subtle */
+[class*="_PuckHeader_"] [style*="cursor: pointer"]:not(button) {
+  background: #7C5CFC !important;
+  color: #FFFFFF !important;
+  font-size: 12px !important;
+  padding: 6px 14px !important;
+  border-radius: 6px !important;
+}
+
+/* ============================================
+   LEFT PANEL — LAYERS / BLOCKS
+   ============================================ */
+[class*="_PuckLayout-leftSideBar_"],
+[class*="_Sidebar_"] {
+  background: #111111 !important;
+  border-right: 1px solid #222222 !important;
+  width: 240px !important;
+  min-width: 240px !important;
+}
+
+/* Navigation tabs (Blocks / Outline) */
+[class*="_Nav_"] {
+  background: #111111 !important;
+  border-bottom: 1px solid #222222 !important;
+}
+
+[class*="_NavItem_"] {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #888888 !important;
+  height: 36px !important;
+  border-bottom: 2px solid transparent !important;
+}
+
+[class*="_NavItem_"]:hover {
   color: #CCCCCC !important;
 }
 
-[class*="_IconButton_"]:hover {
-  background-color: #222222 !important;
+/* Active tab */
+[class*="_NavItem_"][class*="--active"],
+[class*="_NavItem_"][aria-selected="true"],
+nav [role="listitem"] [style*="color"] {
+  color: #FFFFFF !important;
+  border-bottom-color: #7C5CFC !important;
 }
 
-/* Scrollbar styling */
+/* Category headers (LAYOUT, CONTENT, etc.) */
+[class*="_ComponentList_"] > [class*="_title"],
+[class*="_ComponentList_"] button[class*="_ComponentList"] {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #888888 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+/* Component drawer items */
+[class*="_DrawerItem_"],
+[class*="_Drawer_"] [class*="_DrawerItem_"],
+[class*="_DrawerItem_"] * {
+  background: #1A1A1A !important;
+  border: 1px solid #2A2A2A !important;
+  border-radius: 6px !important;
+  color: #CCCCCC !important;
+  font-size: 12px !important;
+  min-height: 36px !important;
+}
+
+/* Drawer item text specifically */
+[class*="_DrawerItem_"] span,
+[class*="_DrawerItem_"] div {
+  color: #CCCCCC !important;
+  border: none !important;
+}
+
+[class*="_DrawerItem_"]:hover {
+  background: #222222 !important;
+  border-color: #333333 !important;
+}
+
+/* Layer tree items (Outline view) */
+[class*="_Layer_"] {
+  font-size: 12px !important;
+  color: #CCCCCC !important;
+  min-height: 28px !important;
+}
+
+[class*="_Layer_"]:hover {
+  background: #1F1F1F !important;
+}
+
+[class*="_Layer_"][class*="--isSelected"],
+[class*="_LayerTree_"] [class*="--isSelected"] {
+  background: rgba(124, 92, 252, 0.15) !important;
+  color: #FFFFFF !important;
+  border-left: 2px solid #7C5CFC !important;
+}
+
+/* Layer tree chevrons */
+[class*="_LayerTree_"] svg {
+  color: #555555 !important;
+}
+
+/* Outline plugin container */
+[class*="_OutlinePlugin_"] {
+  background: #111111 !important;
+}
+
+[class*="_BlocksPlugin_"] {
+  background: #111111 !important;
+}
+
+/* ============================================
+   RIGHT PANEL — PROPERTIES
+   ============================================ */
+[class*="_PuckLayout-rightSideBar_"] {
+  background: #111111 !important;
+  border-left: 1px solid #222222 !important;
+  width: 260px !important;
+  min-width: 260px !important;
+}
+
+/* Section headers in properties panel */
+[class*="_SidebarSection_"] > [class*="_title"],
+[class*="_SidebarSection_"] h2,
+[class*="_Heading_"] {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #888888 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  padding: 12px 16px 6px !important;
+}
+
+/* Breadcrumb navigation (Page > Component) */
+[class*="_Breadcrumbs_"] {
+  color: #888888 !important;
+  font-size: 12px !important;
+}
+
+[class*="_Breadcrumbs_"] a {
+  color: #888888 !important;
+}
+
+[class*="_Breadcrumbs_"] a:hover {
+  color: #FFFFFF !important;
+}
+
+/* Property labels */
+[class*="_FieldLabel_"],
+[class*="_Input_"] label,
+[class*="_PuckFields_"] label,
+label[class*="_fieldLabel"] {
+  font-size: 12px !important;
+  color: #CCCCCC !important;
+}
+
+/* ALL input fields, textareas, selects */
+[class*="_PuckFields_"] input,
+[class*="_PuckFields_"] textarea,
+[class*="_PuckFields_"] select,
+[class*="_Input_"] input,
+[class*="_Input_"] textarea,
+[class*="_Input_"] select,
+[class*="_InputWrapper_"] input,
+[class*="_InputWrapper_"] textarea,
+[class*="_InputWrapper_"] select,
+[class*="_Select_"] select,
+[class*="_ArrayField_"] input,
+[class*="_ArrayField_"] textarea,
+[class*="_ArrayField_"] select {
+  background: #1A1A1A !important;
+  border: 1px solid #2A2A2A !important;
+  border-radius: 6px !important;
+  color: #FFFFFF !important;
+  font-size: 12px !important;
+  height: 28px !important;
+  padding: 0 8px !important;
+}
+
+[class*="_PuckFields_"] input:focus,
+[class*="_PuckFields_"] textarea:focus,
+[class*="_PuckFields_"] select:focus,
+[class*="_Input_"] input:focus,
+[class*="_Input_"] textarea:focus {
+  border-color: #7C5CFC !important;
+  outline: none !important;
+}
+
+/* Textareas need auto height */
+[class*="_PuckFields_"] textarea,
+[class*="_Input_"] textarea {
+  height: auto !important;
+  min-height: 56px !important;
+  padding: 8px !important;
+}
+
+/* Dropdown chevron */
+[class*="_Select_"] svg,
+[class*="_PuckFields_"] select + svg {
+  color: #888888 !important;
+}
+
+/* Select options */
+option {
+  background: #1A1A1A !important;
+  color: #FFFFFF !important;
+}
+
+/* Section dividers */
+[class*="_SidebarSection_"] {
+  border-bottom: 1px solid #222222 !important;
+}
+
+/* Fields plugin background */
+[class*="_FieldsPlugin_"],
+[class*="_PuckFields_"] {
+  background: #111111 !important;
+  overflow: visible !important;
+}
+
+/* Allow color picker popovers to overflow panels */
+[class*="_PuckLayout-rightSideBar_"] > *,
+[class*="_SidebarSection_"] {
+  overflow: visible !important;
+}
+
+/* Array field items (features, testimonials) */
+[class*="_ArrayFieldItem_"] {
+  background: #1A1A1A !important;
+  border: 1px solid #2A2A2A !important;
+  border-radius: 6px !important;
+}
+
+/* ============================================
+   CANVAS
+   ============================================ */
+[class*="_PuckCanvas_"],
+[class*="_PuckPreview_"] {
+  background: #0D0D0D !important;
+}
+
+/* Canvas page area — white with subtle shadow */
+[class*="_PuckPreview_"] iframe {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Selected element outline */
+[data-puck-overlay] [class*="--isSelected"],
+[class*="_DraggableComponent_"][class*="--isSelected"] {
+  outline: 2px solid #7C5CFC !important;
+  outline-offset: 1px !important;
+}
+
+/* Hover element outline */
+[data-puck-overlay] [class*="--isHovered"]:not([class*="--isSelected"]),
+[class*="_DraggableComponent_"][class*="--isHovered"]:not([class*="--isSelected"]) {
+  outline: 1px dashed rgba(124, 92, 252, 0.4) !important;
+}
+
+/* Selection label (component name tag) */
+[class*="_ActionBar_"] {
+  background: #7C5CFC !important;
+  color: #FFFFFF !important;
+  font-size: 11px !important;
+  border-radius: 3px !important;
+  font-family: 'Inter', -apple-system, sans-serif !important;
+}
+
+[class*="_ActionBarAction_"] {
+  color: #FFFFFF !important;
+}
+
+[class*="_ActionBarAction_"]:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Viewport controls */
+[class*="_ViewportControls_"] {
+  background: #1A1A1A !important;
+  border-bottom: 1px solid #2A2A2A !important;
+}
+
+[class*="_ViewportControls_"] button {
+  color: #888888 !important;
+}
+
+[class*="_ViewportControls_"] button[disabled] {
+  color: #888888 !important;
+  background: #2A2A2A !important;
+}
+
+[class*="_ViewportControls_"] button:hover:not([disabled]) {
+  color: #FFFFFF !important;
+}
+
+/* ============================================
+   SCROLLBARS
+   ============================================ */
 [class*="_PuckLayout_"] ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 [class*="_PuckLayout_"] ::-webkit-scrollbar-track {
@@ -106,39 +389,89 @@ header[class*="_PuckLayout"] {
   border-radius: 3px;
 }
 
-/* Breadcrumb in right sidebar */
-[class*="_SidebarSection-breadcrumb_"],
-[class*="_SidebarSection_"] h2 {
-  color: #E8E8E8 !important;
+[class*="_PuckLayout_"] ::-webkit-scrollbar-thumb:hover {
+  background: #444444;
 }
 
-/* Field labels */
-[class*="_FieldLabel_"],
-[class*="_fieldLabel_"],
-label {
-  color: #AAAAAA !important;
+/* ============================================
+   DRAG & DROP ZONES
+   ============================================ */
+[class*="_DropZone_"][class*="--isDestination"] {
+  outline: 2px dashed #7C5CFC !important;
 }
 
-/* Navigation tabs (Blocks, Outline) */
-[class*="_SideBarSection_"] [role="listitem"],
-nav[class*="_PuckLayout"] [role="listitem"] {
-  color: #999999 !important;
+/* Drop zone empty state */
+[class*="_DropZone_"]:empty::after,
+[class*="_DropZone_"][class*="--isEmpty"]::after {
+  color: #555555 !important;
 }
 
-nav[class*="_PuckLayout"] [role="listitem"]:hover {
+/* ============================================
+   MODAL OVERLAY (for export etc.)
+   ============================================ */
+[class*="_Modal_"] {
+  background: #1A1A1A !important;
+  border: 1px solid #2A2A2A !important;
   color: #FFFFFF !important;
 }
 
-/* Publish button - make it purple */
-[class*="_PuckLayout-header_"] [class*="_Button_"][style*="cursor: pointer"]:last-child,
-[class*="_PuckLayout-header_"] > div > div:last-child > [style*="cursor"] {
-  background-color: #7C5CFC !important;
-  color: white !important;
+/* ============================================
+   RESIZE HANDLE
+   ============================================ */
+[class*="_ResizeHandle_"] {
+  background: #2A2A2A !important;
 }
 
-/* Selected element highlight in canvas */
-[data-puck-overlay] [class*="_overlay--isSelected_"],
-[class*="_DropZone-item--isSelected_"] {
-  outline: 2px solid #7C5CFC !important;
-  outline-offset: 1px;
+[class*="_ResizeHandle_"]:hover {
+  background: #7C5CFC !important;
+}
+
+/* ============================================
+   MENU BAR (right-click context menus)
+   ============================================ */
+[class*="_MenuBar_"] {
+  background: #1A1A1A !important;
+  border: 1px solid #2A2A2A !important;
+}
+
+/* ============================================
+   PUCK PLUGIN TABS (bottom of left sidebar)
+   ============================================ */
+[class*="_PuckPluginTab_"] {
+  background: #111111 !important;
+  border-top: 1px solid #222222 !important;
+}
+
+/* ============================================
+   GENERAL OVERRIDES — Catch-all for Puck internals
+   ============================================ */
+
+/* Ensure no white backgrounds leak through */
+[class*="_PuckLayout_"] {
+  background: #0D0D0D !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* Button styles within Puck */
+[class*="_Button_"] {
+  font-family: 'Inter', -apple-system, sans-serif !important;
+  font-size: 12px !important;
+}
+
+/* Loading indicator */
+[class*="_Loader_"] {
+  border-color: #333333 !important;
+  border-top-color: #7C5CFC !important;
+}
+
+/* Control wrapper */
+[class*="_Control_"] {
+  background: #111111 !important;
+}
+
+/* Inline text field */
+[class*="_InlineTextField_"] input {
+  background: transparent !important;
+  color: #FFFFFF !important;
+  border: none !important;
 }
