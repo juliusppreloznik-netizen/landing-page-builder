@@ -20,6 +20,7 @@ export type TestimonialsProps = {
   paddingRight: string;
   marginTop: string;
   marginBottom: string;
+  borderRadius: string;
 };
 
 export const Testimonials: ComponentConfig<TestimonialsProps> = {
@@ -89,6 +90,10 @@ export const Testimonials: ComponentConfig<TestimonialsProps> = {
       type: "text",
       label: "Margin Bottom",
     },
+    borderRadius: {
+      type: "text",
+      label: "Border Radius",
+    },
   },
   defaultProps: {
     heading: "Trusted by Industry Leaders",
@@ -122,6 +127,7 @@ export const Testimonials: ComponentConfig<TestimonialsProps> = {
     paddingRight: "24px",
     marginTop: "0px",
     marginBottom: "0px",
+    borderRadius: "0px",
   },
   render: ({
     heading,
@@ -136,6 +142,7 @@ export const Testimonials: ComponentConfig<TestimonialsProps> = {
     paddingRight,
     marginTop,
     marginBottom,
+    borderRadius,
   }) => {
     return (
       <section
@@ -148,6 +155,7 @@ export const Testimonials: ComponentConfig<TestimonialsProps> = {
           paddingRight,
           marginTop,
           marginBottom,
+          borderRadius,
         }}
       >
         <div className="max-w-6xl mx-auto">

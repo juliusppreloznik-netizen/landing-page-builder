@@ -7,6 +7,8 @@ export type TextProps = {
   opacity: string;
   marginBottom: string;
   maxWidth: string;
+  backgroundColor: string;
+  borderRadius: string;
 };
 
 export const Text: ComponentConfig<TextProps> = {
@@ -42,6 +44,14 @@ export const Text: ComponentConfig<TextProps> = {
       type: "text",
       label: "Max Width",
     },
+    backgroundColor: {
+      type: "text",
+      label: "Background Color",
+    },
+    borderRadius: {
+      type: "text",
+      label: "Border Radius",
+    },
   },
   defaultProps: {
     content: "Your text content here. Add compelling copy that speaks to your audience.",
@@ -50,8 +60,10 @@ export const Text: ComponentConfig<TextProps> = {
     opacity: "0.9",
     marginBottom: "32px",
     maxWidth: "640px",
+    backgroundColor: "transparent",
+    borderRadius: "0px",
   },
-  render: ({ content, size, color, opacity, marginBottom, maxWidth }) => {
+  render: ({ content, size, color, opacity, marginBottom, maxWidth, backgroundColor, borderRadius }) => {
     const sizeClass = {
       sm: "text-sm",
       base: "text-base",
@@ -66,6 +78,8 @@ export const Text: ComponentConfig<TextProps> = {
           opacity: parseFloat(opacity),
           marginBottom,
           maxWidth,
+          backgroundColor,
+          borderRadius,
         }}
         className={sizeClass}
       >

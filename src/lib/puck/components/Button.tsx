@@ -10,6 +10,7 @@ export type ButtonProps = {
   marginTop: string;
   marginBottom: string;
   marginRight: string;
+  borderRadius: string;
 };
 
 export const Button: ComponentConfig<ButtonProps> = {
@@ -61,6 +62,10 @@ export const Button: ComponentConfig<ButtonProps> = {
       type: "text",
       label: "Margin Right",
     },
+    borderRadius: {
+      type: "text",
+      label: "Border Radius",
+    },
   },
   defaultProps: {
     text: "Get Started",
@@ -72,8 +77,9 @@ export const Button: ComponentConfig<ButtonProps> = {
     marginTop: "0px",
     marginBottom: "0px",
     marginRight: "0px",
+    borderRadius: "8px",
   },
-  render: ({ text, link, variant, size, backgroundColor, textColor, marginTop, marginBottom, marginRight }) => {
+  render: ({ text, link, variant, size, backgroundColor, textColor, marginTop, marginBottom, marginRight, borderRadius }) => {
     const sizeClass = {
       sm: "px-4 py-2 text-sm",
       md: "px-6 py-3 text-base",
@@ -106,9 +112,10 @@ export const Button: ComponentConfig<ButtonProps> = {
           marginTop,
           marginBottom,
           marginRight,
+          borderRadius,
           display: "inline-block",
         }}
-        className={`${sizeClass} font-semibold rounded-lg hover:opacity-90 transition-opacity cursor-pointer`}
+        className={`${sizeClass} font-semibold hover:opacity-90 transition-opacity cursor-pointer`}
       >
         {text}
       </a>

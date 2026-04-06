@@ -14,6 +14,7 @@ export type HeroSectionProps = {
   paddingRight: string;
   marginTop: string;
   marginBottom: string;
+  borderRadius: string;
 };
 
 export const HeroSection: ComponentConfig<HeroSectionProps> = {
@@ -76,6 +77,10 @@ export const HeroSection: ComponentConfig<HeroSectionProps> = {
       type: "text",
       label: "Margin Bottom",
     },
+    borderRadius: {
+      type: "text",
+      label: "Border Radius",
+    },
   },
   defaultProps: {
     headline: "Transform Your Business Today",
@@ -91,6 +96,7 @@ export const HeroSection: ComponentConfig<HeroSectionProps> = {
     paddingRight: "24px",
     marginTop: "0px",
     marginBottom: "0px",
+    borderRadius: "0px",
   },
   render: ({
     headline,
@@ -106,6 +112,7 @@ export const HeroSection: ComponentConfig<HeroSectionProps> = {
     paddingRight,
     marginTop,
     marginBottom,
+    borderRadius,
   }) => {
     const alignmentClass = {
       left: "text-left items-start",
@@ -124,6 +131,7 @@ export const HeroSection: ComponentConfig<HeroSectionProps> = {
           paddingRight,
           marginTop,
           marginBottom,
+          borderRadius,
         }}
         className={`flex flex-col ${alignmentClass}`}
       >

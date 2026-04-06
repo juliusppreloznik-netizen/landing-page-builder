@@ -19,6 +19,7 @@ export type FeatureGridProps = {
   paddingRight: string;
   marginTop: string;
   marginBottom: string;
+  borderRadius: string;
 };
 
 const iconMap: Record<string, JSX.Element> = {
@@ -132,6 +133,10 @@ export const FeatureGrid: ComponentConfig<FeatureGridProps> = {
       type: "text",
       label: "Margin Bottom",
     },
+    borderRadius: {
+      type: "text",
+      label: "Border Radius",
+    },
   },
   defaultProps: {
     heading: "Everything You Need to Succeed",
@@ -150,6 +155,7 @@ export const FeatureGrid: ComponentConfig<FeatureGridProps> = {
     paddingRight: "24px",
     marginTop: "0px",
     marginBottom: "0px",
+    borderRadius: "0px",
   },
   render: ({
     heading,
@@ -164,6 +170,7 @@ export const FeatureGrid: ComponentConfig<FeatureGridProps> = {
     paddingRight,
     marginTop,
     marginBottom,
+    borderRadius,
   }) => {
     const gridCols = {
       "2": "md:grid-cols-2",
@@ -182,6 +189,7 @@ export const FeatureGrid: ComponentConfig<FeatureGridProps> = {
           paddingRight,
           marginTop,
           marginBottom,
+          borderRadius,
         }}
       >
         <div className="max-w-6xl mx-auto">

@@ -1,6 +1,7 @@
 import { anthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
 import { NextResponse } from "next/server";
+import { buildSkillsPrompt } from "@/lib/skills";
 
 export const maxDuration = 60;
 
@@ -52,48 +53,7 @@ Available Puck components and their props:
    - marginTop/marginBottom: string
 `;
 
-const SYSTEM_PROMPT = `You are an expert landing page designer and direct-response copywriter. Your job is to generate complete landing page structures as Puck editor JSON.
-
-${COMPONENT_SCHEMA}
-
-OUTPUT FORMAT:
-Return ONLY a valid JSON object with this exact structure (no markdown, no explanation):
-{
-  "content": [
-    {
-      "type": "ComponentName",
-      "props": {
-        "id": "unique-id",
-        ...all required props for that component
-      }
-    }
-  ],
-  "root": { "props": {} }
-}
-
-COPY GUIDELINES (direct-response principles):
-- Headlines: Offer-based, promising clear and specific value. Lead with the transformation.
-- Subheadlines: Proof-driven claims with specific numbers when possible.
-- Feature descriptions: Pain-agitated openings that address real customer problems, then resolve them.
-- Testimonials: Specific, results-oriented quotes with concrete outcomes.
-- CTA sections: Guarantee-backed closes that reduce perceived risk. Use urgency without being pushy.
-
-DESIGN GUIDELINES:
-- Use a cohesive color palette (2-3 colors max, with complementary tones)
-- Dark hero sections (#0f172a, #1e293b) with light text work well
-- Feature sections can alternate between dark and light backgrounds
-- CTA sections should use a bold accent color (#4f46e5 indigo works well)
-- Ensure sufficient contrast between text and background colors
-- Use consistent padding (80px top/bottom is standard for sections)
-
-STRUCTURE:
-A complete landing page should typically include:
-1. Hero Section (above the fold, with compelling headline)
-2. Feature Grid (3-4 key benefits/features)
-3. Testimonials (2-3 social proof items)
-4. Call to Action (final conversion push)
-
-Every component MUST have a unique "id" prop (use descriptive slugs like "hero-1", "features-1", etc).`;
+const SYSTEM_PROMPT = buildSkillsPrompt(false) + `\n\n${COMPONENT_SCHEMA}`;
 
 export async function POST(req: Request) {
   try {

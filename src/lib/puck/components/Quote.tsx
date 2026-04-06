@@ -6,6 +6,8 @@ export type QuoteProps = {
   role: string;
   company: string;
   textColor: string;
+  backgroundColor: string;
+  borderRadius: string;
 };
 
 export const Quote: ComponentConfig<QuoteProps> = {
@@ -31,6 +33,14 @@ export const Quote: ComponentConfig<QuoteProps> = {
       type: "text",
       label: "Text Color",
     },
+    backgroundColor: {
+      type: "text",
+      label: "Background Color",
+    },
+    borderRadius: {
+      type: "text",
+      label: "Border Radius",
+    },
   },
   defaultProps: {
     text: "This product has completely transformed how we work. Highly recommended!",
@@ -38,10 +48,12 @@ export const Quote: ComponentConfig<QuoteProps> = {
     role: "CEO",
     company: "Acme Inc",
     textColor: "#ffffff",
+    backgroundColor: "#1e293b",
+    borderRadius: "12px",
   },
-  render: ({ text, author, role, company, textColor }) => {
+  render: ({ text, author, role, company, textColor, backgroundColor, borderRadius }) => {
     return (
-      <div style={{ color: textColor }}>
+      <div style={{ color: textColor, backgroundColor, borderRadius }}>
         <div className="mb-4">
           <svg
             className="w-8 h-8 opacity-50"

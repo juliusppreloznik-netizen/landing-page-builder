@@ -11,6 +11,7 @@ export type ContainerProps = {
   marginBottom: string;
   maxWidth: "full" | "7xl" | "6xl" | "5xl" | "4xl" | "3xl";
   alignment: "left" | "center" | "right";
+  borderRadius: string;
 };
 
 export const Container: ComponentConfig<ContainerProps> = {
@@ -65,6 +66,10 @@ export const Container: ComponentConfig<ContainerProps> = {
         { label: "Right", value: "right" },
       ],
     },
+    borderRadius: {
+      type: "text",
+      label: "Border Radius",
+    },
   },
   defaultProps: {
     backgroundColor: "#1e293b",
@@ -76,6 +81,7 @@ export const Container: ComponentConfig<ContainerProps> = {
     marginBottom: "0px",
     maxWidth: "6xl",
     alignment: "center",
+    borderRadius: "0px",
   },
   render: ({
     backgroundColor,
@@ -87,6 +93,7 @@ export const Container: ComponentConfig<ContainerProps> = {
     marginBottom,
     maxWidth,
     alignment,
+    borderRadius,
   }) => {
     const maxWidthClass = {
       full: "max-w-full",
@@ -113,6 +120,7 @@ export const Container: ComponentConfig<ContainerProps> = {
           paddingRight,
           marginTop,
           marginBottom,
+          borderRadius,
         }}
       >
         <div className={`mx-auto ${maxWidthClass} flex flex-col ${alignmentClass}`}>

@@ -16,6 +16,7 @@ export type CallToActionProps = {
   paddingRight: string;
   marginTop: string;
   marginBottom: string;
+  borderRadius: string;
 };
 
 export const CallToAction: ComponentConfig<CallToActionProps> = {
@@ -86,6 +87,10 @@ export const CallToAction: ComponentConfig<CallToActionProps> = {
       type: "text",
       label: "Margin Bottom",
     },
+    borderRadius: {
+      type: "text",
+      label: "Border Radius",
+    },
   },
   defaultProps: {
     headline: "Ready to Get Started?",
@@ -103,6 +108,7 @@ export const CallToAction: ComponentConfig<CallToActionProps> = {
     paddingRight: "24px",
     marginTop: "0px",
     marginBottom: "0px",
+    borderRadius: "0px",
   },
   render: ({
     headline,
@@ -120,6 +126,7 @@ export const CallToAction: ComponentConfig<CallToActionProps> = {
     paddingRight,
     marginTop,
     marginBottom,
+    borderRadius,
   }) => {
     const alignmentClass = {
       left: "text-left items-start",
@@ -138,6 +145,7 @@ export const CallToAction: ComponentConfig<CallToActionProps> = {
           paddingRight,
           marginTop,
           marginBottom,
+          borderRadius,
         }}
         className={`flex flex-col ${alignmentClass}`}
       >

@@ -5,6 +5,8 @@ export type HeadingProps = {
   level: "h1" | "h2" | "h3" | "h4";
   color: string;
   marginBottom: string;
+  backgroundColor: string;
+  borderRadius: string;
 };
 
 export const Heading: ComponentConfig<HeadingProps> = {
@@ -32,14 +34,24 @@ export const Heading: ComponentConfig<HeadingProps> = {
       type: "text",
       label: "Margin Bottom",
     },
+    backgroundColor: {
+      type: "text",
+      label: "Background Color",
+    },
+    borderRadius: {
+      type: "text",
+      label: "Border Radius",
+    },
   },
   defaultProps: {
     text: "Your Headline Here",
     level: "h1",
     color: "#ffffff",
     marginBottom: "24px",
+    backgroundColor: "transparent",
+    borderRadius: "0px",
   },
-  render: ({ text, level, color, marginBottom }) => {
+  render: ({ text, level, color, marginBottom, backgroundColor, borderRadius }) => {
     const sizeClass = {
       h1: "text-4xl md:text-5xl lg:text-6xl font-bold leading-tight",
       h2: "text-3xl md:text-4xl font-bold",
@@ -51,7 +63,7 @@ export const Heading: ComponentConfig<HeadingProps> = {
 
     return (
       <Tag
-        style={{ color, marginBottom }}
+        style={{ color, marginBottom, backgroundColor, borderRadius }}
         className={sizeClass}
       >
         {text}

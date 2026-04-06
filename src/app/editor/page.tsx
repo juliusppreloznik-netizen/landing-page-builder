@@ -3,7 +3,7 @@
 import { Puck, Data, createUsePuck } from "@puckeditor/core";
 import "@puckeditor/core/puck.css";
 import { puckConfig } from "@/lib/puck/config";
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { AIChatSidebar } from "@/components/AIChatSidebar";
 
 const usePuck = createUsePuck();
@@ -332,40 +332,95 @@ function EditorWithAI() {
 
 export default function EditorPage() {
   const [data, setData] = useState<Data>(initialData);
+  const [pageId, setPageId] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState(false);
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Load generated page data from sessionStorage if redirected from /generate
+  // Load page data from Supabase or sessionStorage on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get("source") === "generated") {
+    const pid = params.get("pageId");
+    const source = params.get("source");
+
+    if (pid) {
+      // Load from Supabase
+      setPageId(pid);
+      fetch(`/api/pages?id=${pid}`)
+        .then((r) => r.json())
+        .then(({ version }) => {
+          if (version?.content_json) {
+            setData(version.content_json as Data);
+          }
+        })
+        .catch(() => {})
+        .finally(() => setLoaded(true));
+    } else if (source === "generated") {
       const stored = sessionStorage.getItem("generatedPageData");
+      const storedPageId = sessionStorage.getItem("generatedPageId");
       if (stored) {
         try {
-          const generated = JSON.parse(stored) as Data;
-          setData(generated);
+          setData(JSON.parse(stored) as Data);
+          if (storedPageId) setPageId(storedPageId);
           sessionStorage.removeItem("generatedPageData");
-          // Clean URL without reload
-          window.history.replaceState({}, "", "/editor");
-        } catch {
-          // Ignore parse errors, keep default data
-        }
+          sessionStorage.removeItem("generatedPageId");
+        } catch {}
       }
+      window.history.replaceState({}, "", "/editor");
+      setLoaded(true);
+    } else {
+      setLoaded(true);
     }
   }, []);
 
+  // Auto-save to Supabase when data changes (debounced 2s)
+  const handleChange = useCallback(
+    (newData: Data) => {
+      setData(newData);
+
+      if (!pageId) return;
+
+      if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+      autoSaveTimer.current = setTimeout(() => {
+        fetch("/api/pages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pageId, contentJson: newData }),
+        }).catch(() => {});
+      }, 2000);
+    },
+    [pageId]
+  );
+
   const handlePublish = async (publishData: Data) => {
-    console.log("Publishing:", publishData);
+    // Save immediately on publish
+    if (pageId) {
+      await fetch("/api/pages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pageId, contentJson: publishData }),
+      });
+    }
     setData(publishData);
   };
+
+  if (!loaded) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-slate-950">
+        <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex">
       {/* Puck Editor - takes remaining space, leaving room for AI sidebar */}
       <div className="flex-1 h-full overflow-hidden" style={{ maxWidth: 'calc(100vw - 320px)' }}>
         <Puck
+          key={pageId || "default"}
           config={puckConfig}
           data={data}
           onPublish={handlePublish}
-          onChange={setData}
+          onChange={handleChange}
           ui={{ rightSideBarVisible: false }}
           overrides={{
             puck: ({ children }) => (
