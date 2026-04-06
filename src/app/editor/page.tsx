@@ -2,125 +2,17 @@
 
 import { Puck, Data, createUsePuck } from "@puckeditor/core";
 import "@puckeditor/core/puck.css";
+import "./editor-dark-theme.css";
 import { puckConfig } from "@/lib/puck/config";
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { AIChatSidebar } from "@/components/AIChatSidebar";
+import { ExportHTMLModal } from "@/components/ExportHTMLModal";
 
 const usePuck = createUsePuck();
 
-// Sample data with nested composable components
+// Default empty editor - users create content via generation or drag-and-drop
 const initialData: Data = {
-  content: [
-    {
-      type: "Heading",
-      props: {
-        id: "heading-1",
-        text: "Transform Your Business Today",
-        level: "h1",
-        color: "#1e293b",
-        marginBottom: "24px",
-      },
-    },
-    {
-      type: "Text",
-      props: {
-        id: "text-1",
-        content: "Join thousands of companies already using our platform to accelerate growth and maximize results.",
-        size: "lg",
-        color: "#475569",
-        opacity: "1",
-        marginBottom: "32px",
-        maxWidth: "640px",
-      },
-    },
-    {
-      type: "Button",
-      props: {
-        id: "button-1",
-        text: "Get Started Now",
-        link: "#",
-        variant: "primary",
-        size: "lg",
-        backgroundColor: "#4f46e5",
-        textColor: "#ffffff",
-        marginTop: "0px",
-        marginBottom: "48px",
-        marginRight: "16px",
-      },
-    },
-    {
-      type: "Button",
-      props: {
-        id: "button-2",
-        text: "Learn More",
-        link: "#",
-        variant: "outline",
-        size: "lg",
-        backgroundColor: "#4f46e5",
-        textColor: "#4f46e5",
-        marginTop: "0px",
-        marginBottom: "48px",
-        marginRight: "0px",
-      },
-    },
-    {
-      type: "Heading",
-      props: {
-        id: "heading-2",
-        text: "Why Choose Us",
-        level: "h2",
-        color: "#1e293b",
-        marginBottom: "16px",
-      },
-    },
-    {
-      type: "Text",
-      props: {
-        id: "text-2",
-        content: "We provide everything you need to succeed.",
-        size: "lg",
-        color: "#64748b",
-        opacity: "1",
-        marginBottom: "48px",
-        maxWidth: "100%",
-      },
-    },
-    {
-      type: "Icon",
-      props: {
-        id: "icon-1",
-        icon: "bolt",
-        size: "24px",
-        color: "#ffffff",
-        backgroundColor: "#4f46e5",
-        padding: "12px",
-        borderRadius: "8px",
-        marginBottom: "16px",
-      },
-    },
-    {
-      type: "Heading",
-      props: {
-        id: "heading-3",
-        text: "Lightning Fast",
-        level: "h3",
-        color: "#1e293b",
-        marginBottom: "8px",
-      },
-    },
-    {
-      type: "Text",
-      props: {
-        id: "text-3",
-        content: "Experience blazing speed with our optimized infrastructure.",
-        size: "base",
-        color: "#64748b",
-        opacity: "1",
-        marginBottom: "32px",
-        maxWidth: "100%",
-      },
-    },
-  ],
+  content: [],
   root: { props: {} },
 };
 
@@ -334,7 +226,10 @@ export default function EditorPage() {
   const [data, setData] = useState<Data>(initialData);
   const [pageId, setPageId] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [showExport, setShowExport] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   // Load page data from Supabase or sessionStorage on mount
   useEffect(() => {
@@ -403,6 +298,34 @@ export default function EditorPage() {
     setData(publishData);
   };
 
+  const handleManualSave = useCallback(async () => {
+    if (!pageId) return;
+    setSaveStatus("saving");
+    try {
+      await fetch("/api/pages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pageId, contentJson: data }),
+      });
+      setSaveStatus("saved");
+      setTimeout(() => setSaveStatus("idle"), 2000);
+    } catch {
+      setSaveStatus("idle");
+    }
+  }, [pageId, data]);
+
+  // Grab iframe ref after Puck mounts
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const iframe = document.querySelector("#preview-frame") as HTMLIFrameElement;
+      if (iframe) {
+        iframeRef.current = iframe;
+        clearInterval(interval);
+      }
+    }, 500);
+    return () => clearInterval(interval);
+  }, [loaded]);
+
   if (!loaded) {
     return (
       <div className="h-screen flex items-center justify-center bg-slate-950">
@@ -423,13 +346,67 @@ export default function EditorPage() {
           onChange={handleChange}
           ui={{ rightSideBarVisible: false }}
           overrides={{
+            headerActions: () => (
+              <div className="flex items-center gap-2">
+                {/* Save Button */}
+                <button
+                  onClick={handleManualSave}
+                  disabled={!pageId || saveStatus === "saving"}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors"
+                  style={{
+                    background: saveStatus === "saved" ? "#1a3a1a" : "#1A1A1A",
+                    color: saveStatus === "saved" ? "#4ade80" : "#CCC",
+                    border: "1px solid #333",
+                  }}
+                >
+                  {saveStatus === "saving" ? (
+                    <>
+                      <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
+                      Saving...
+                    </>
+                  ) : saveStatus === "saved" ? (
+                    <>
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Saved
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                      </svg>
+                      Save
+                    </>
+                  )}
+                </button>
+
+                {/* Export HTML Button */}
+                <button
+                  onClick={() => setShowExport(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors"
+                  style={{ background: "#1A1A1A", color: "#CCC", border: "1px solid #333" }}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
+                  Export HTML
+                </button>
+              </div>
+            ),
             puck: ({ children }) => (
               <>
                 {children}
                 {/* AI Sidebar rendered inside Puck context for usePuck access */}
-                <div className="fixed right-0 top-0 w-80 h-screen border-l border-slate-700 shadow-xl z-50">
+                <div className="fixed right-0 top-0 w-80 h-screen border-l border-[#222] shadow-xl z-50">
                   <EditorWithAI />
                 </div>
+                {/* Export HTML Modal */}
+                <ExportHTMLModal
+                  isOpen={showExport}
+                  onClose={() => setShowExport(false)}
+                  iframeRef={iframeRef.current}
+                />
               </>
             ),
           }}

@@ -1,0 +1,144 @@
+/* Dark theme overrides for Puck editor */
+
+/* Invert the grey scale for dark mode */
+:root {
+  --puck-color-grey-12: #0D0D0D;
+  --puck-color-grey-11: #111111;
+  --puck-color-grey-10: #1A1A1A;
+  --puck-color-grey-09: #222222;
+  --puck-color-grey-08: #2A2A2A;
+  --puck-color-grey-07: #3A3A3A;
+  --puck-color-grey-06: #555555;
+  --puck-color-grey-05: #666666;
+  --puck-color-grey-04: #999999;
+  --puck-color-grey-03: #AAAAAA;
+  --puck-color-grey-02: #CCCCCC;
+  --puck-color-grey-01: #E8E8E8;
+  --puck-color-white: #FFFFFF;
+  --puck-color-black: #000000;
+
+  /* Azure accent - use a vivid purple/blue for selection */
+  --puck-color-azure-04: #7C5CFC;
+  --puck-color-azure-05: #7C5CFC;
+  --puck-color-azure-06: #9B82FC;
+  --puck-color-azure-07: #B8A4FD;
+  --puck-color-azure-08: #D4CAFE;
+  --puck-color-azure-09: #2A2040;
+  --puck-color-azure-10: #1E1830;
+  --puck-color-azure-11: #1A1428;
+  --puck-color-azure-12: #141020;
+}
+
+/* Canvas area - slightly lighter to distinguish from chrome */
+[class*="_PuckLayout_"] [class*="_PuckPreview_"],
+[class*="_PuckLayout_"] [class*="_PuckCanvas_"],
+[data-puck-preview] {
+  background-color: #141414 !important;
+}
+
+/* Make sure text in sidebar fields is readable */
+[class*="_PuckFields_"] input,
+[class*="_PuckFields_"] textarea,
+[class*="_PuckFields_"] select {
+  background-color: #1A1A1A !important;
+  color: #E8E8E8 !important;
+  border-color: #333333 !important;
+}
+
+/* Dropdown options */
+[class*="_PuckFields_"] select option {
+  background-color: #1A1A1A;
+  color: #E8E8E8;
+}
+
+/* Header / toolbar area */
+[class*="_PuckLayout-header_"],
+header[class*="_PuckLayout"] {
+  background-color: #0D0D0D !important;
+  border-color: #222222 !important;
+}
+
+/* Sidebar panels */
+[class*="_PuckLayout-leftSideBar_"],
+[class*="_PuckLayout-rightSideBar_"] {
+  background-color: #111111 !important;
+  border-color: #222222 !important;
+}
+
+/* Component drawer items */
+[class*="_Drawer-item_"],
+[class*="_ComponentListItem_"] {
+  background-color: #1A1A1A !important;
+  border-color: #2A2A2A !important;
+  color: #E8E8E8 !important;
+}
+
+[class*="_Drawer-item_"]:hover,
+[class*="_ComponentListItem_"]:hover {
+  background-color: #222222 !important;
+}
+
+/* Category headers */
+[class*="_ComponentList-title_"] {
+  color: #888888 !important;
+}
+
+/* Buttons in toolbar */
+[class*="_IconButton_"] {
+  color: #CCCCCC !important;
+}
+
+[class*="_IconButton_"]:hover {
+  background-color: #222222 !important;
+}
+
+/* Scrollbar styling */
+[class*="_PuckLayout_"] ::-webkit-scrollbar {
+  width: 6px;
+}
+
+[class*="_PuckLayout_"] ::-webkit-scrollbar-track {
+  background: #111111;
+}
+
+[class*="_PuckLayout_"] ::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 3px;
+}
+
+/* Breadcrumb in right sidebar */
+[class*="_SidebarSection-breadcrumb_"],
+[class*="_SidebarSection_"] h2 {
+  color: #E8E8E8 !important;
+}
+
+/* Field labels */
+[class*="_FieldLabel_"],
+[class*="_fieldLabel_"],
+label {
+  color: #AAAAAA !important;
+}
+
+/* Navigation tabs (Blocks, Outline) */
+[class*="_SideBarSection_"] [role="listitem"],
+nav[class*="_PuckLayout"] [role="listitem"] {
+  color: #999999 !important;
+}
+
+nav[class*="_PuckLayout"] [role="listitem"]:hover {
+  color: #FFFFFF !important;
+}
+
+/* Publish button - make it purple */
+[class*="_PuckLayout-header_"] [class*="_Button_"][style*="cursor: pointer"]:last-child,
+[class*="_PuckLayout-header_"] > div > div:last-child > [style*="cursor"] {
+  background-color: #7C5CFC !important;
+  color: white !important;
+}
+
+/* Selected element highlight in canvas */
+[data-puck-overlay] [class*="_overlay--isSelected_"],
+[class*="_DropZone-item--isSelected_"] {
+  outline: 2px solid #7C5CFC !important;
+  outline-offset: 1px;
+}

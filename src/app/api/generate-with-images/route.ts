@@ -3,44 +3,9 @@ import { generateText } from "ai";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { buildSkillsPrompt } from "@/lib/skills";
+import { COMPONENT_SCHEMA } from "@/lib/component-schema";
 
 export const maxDuration = 60;
-
-const COMPONENT_SCHEMA = `
-Available Puck components and their props:
-
-1. HeroSection:
-   - headline: string, subheadline: string, ctaText: string, ctaLink: string
-   - alignment: "left"|"center"|"right"
-   - backgroundColor: string (hex), textColor: string (hex)
-   - paddingTop/paddingBottom/paddingLeft/paddingRight: string (e.g. "80px")
-   - marginTop/marginBottom: string
-
-2. FeatureGrid:
-   - heading: string, subheading: string
-   - features: array of { title: string, description: string, icon: "bolt"|"shield"|"chart"|"clock"|"users"|"cog" }
-   - columns: "2"|"3"|"4"
-   - backgroundColor: string (hex), textColor: string (hex)
-   - paddingTop/paddingBottom/paddingLeft/paddingRight: string
-   - marginTop/marginBottom: string
-
-3. Testimonials:
-   - heading: string, subheading: string
-   - testimonials: array of { quote: string, author: string, role: string, company: string }
-   - layout: "grid"|"carousel"
-   - backgroundColor: string (hex), textColor: string (hex)
-   - paddingTop/paddingBottom/paddingLeft/paddingRight: string
-   - marginTop/marginBottom: string
-
-4. CallToAction:
-   - headline: string, description: string
-   - primaryButtonText: string, primaryButtonLink: string
-   - secondaryButtonText: string, secondaryButtonLink: string
-   - alignment: "left"|"center"|"right"
-   - backgroundColor: string (hex), textColor: string (hex)
-   - paddingTop/paddingBottom/paddingLeft/paddingRight: string
-   - marginTop/marginBottom: string
-`;
 
 export async function POST(req: Request) {
   try {
@@ -109,7 +74,7 @@ ${imageFiles.length > 0 ? `\nCRITICAL: You have been given reference screenshots
       system: systemPrompt,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       messages: [{ role: "user" as const, content: userContent as any }],
-      maxOutputTokens: 4096,
+      maxOutputTokens: 16000,
     });
 
     // Parse JSON

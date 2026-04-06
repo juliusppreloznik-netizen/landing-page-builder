@@ -1,10 +1,6 @@
-import { ComponentConfig } from "@puckeditor/core";
+import { ComponentConfig, DropZone } from "@puckeditor/core";
 
 export type HeroSectionProps = {
-  headline: string;
-  subheadline: string;
-  ctaText: string;
-  ctaLink: string;
   alignment: "left" | "center" | "right";
   backgroundColor: string;
   textColor: string;
@@ -20,22 +16,6 @@ export type HeroSectionProps = {
 export const HeroSection: ComponentConfig<HeroSectionProps> = {
   label: "Hero Section",
   fields: {
-    headline: {
-      type: "text",
-      label: "Headline",
-    },
-    subheadline: {
-      type: "textarea",
-      label: "Subheadline",
-    },
-    ctaText: {
-      type: "text",
-      label: "CTA Button Text",
-    },
-    ctaLink: {
-      type: "text",
-      label: "CTA Button Link",
-    },
     alignment: {
       type: "select",
       label: "Text Alignment",
@@ -83,10 +63,6 @@ export const HeroSection: ComponentConfig<HeroSectionProps> = {
     },
   },
   defaultProps: {
-    headline: "Transform Your Business Today",
-    subheadline: "Join thousands of companies already using our platform to accelerate growth and maximize results.",
-    ctaText: "Get Started Now",
-    ctaLink: "#",
     alignment: "center",
     backgroundColor: "#1e293b",
     textColor: "#ffffff",
@@ -99,10 +75,6 @@ export const HeroSection: ComponentConfig<HeroSectionProps> = {
     borderRadius: "0px",
   },
   render: ({
-    headline,
-    subheadline,
-    ctaText,
-    ctaLink,
     alignment,
     backgroundColor,
     textColor,
@@ -136,20 +108,7 @@ export const HeroSection: ComponentConfig<HeroSectionProps> = {
         className={`flex flex-col ${alignmentClass}`}
       >
         <div className="max-w-4xl mx-auto w-full">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-            {headline}
-          </h1>
-          <p className="text-lg md:text-xl opacity-90 mb-8 max-w-2xl">
-            {subheadline}
-          </p>
-          {ctaText && (
-            <a
-              href={ctaLink}
-              className="inline-block px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors"
-            >
-              {ctaText}
-            </a>
-          )}
+          <DropZone zone="hero-content" />
         </div>
       </section>
     );
