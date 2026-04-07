@@ -5,6 +5,7 @@ import "@puckeditor/core/puck.css";
 import "./editor-dark-theme.css";
 import { puckConfig } from "@/lib/puck/config";
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { AIChatSidebar } from "@/components/AIChatSidebar";
 import { ExportHTMLModal } from "@/components/ExportHTMLModal";
 import { ColorPickerField } from "@/components/fields/ColorPickerField";
@@ -224,6 +225,7 @@ function EditorWithAI() {
 }
 
 export default function EditorPage() {
+  const router = useRouter();
   const [data, setData] = useState<Data>(initialData);
   const [pageId, setPageId] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -393,6 +395,23 @@ export default function EditorPage() {
             puck: ({ children }) => (
               <>
                 {children}
+                {/* Back to projects button — fixed over the Puck header left side */}
+                <button
+                  onClick={() => router.push("/")}
+                  title="Back to projects"
+                  style={{
+                    position: "fixed", top: "10px", left: "12px", zIndex: 100,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    width: "28px", height: "28px", background: "transparent",
+                    border: "none", borderRadius: "6px", cursor: "pointer", color: "#888",
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "#2A2A2A"; e.currentTarget.style.color = "#FFF"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#888"; }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                  </svg>
+                </button>
                 {/* AI Sidebar rendered inside Puck context for usePuck access */}
                 <div className="fixed right-0 top-0 w-80 h-screen border-l border-[#222] shadow-xl z-50">
                   <EditorWithAI />
