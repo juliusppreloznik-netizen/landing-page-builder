@@ -43,7 +43,16 @@ export default function HomePage() {
     router.push("/new");
   };
 
-  const handleOpenProject = (pageId: string) => {
+  const handleOpenProject = async (pageId: string) => {
+    // Check if the latest version is raw_html type
+    try {
+      const res = await fetch(`/api/pages?id=${pageId}`);
+      const { version } = await res.json();
+      if (version?.content_json?.type === "raw_html") {
+        router.push(`/editor-html?pageId=${pageId}`);
+        return;
+      }
+    } catch {}
     router.push(`/editor?pageId=${pageId}`);
   };
 

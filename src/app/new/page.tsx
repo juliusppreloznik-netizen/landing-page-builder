@@ -21,8 +21,10 @@ export default function NewProjectPage() {
     },
   ]);
   const [input, setInput] = useState("");
+  const [pageType, setPageType] = useState<string>("opt-in");
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [imageBase64s, setImageBase64s] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -42,11 +44,15 @@ export default function NewProjectPage() {
     const newImages = [...images, ...files];
     setImages(newImages);
 
-    // Generate previews
+    // Generate previews and base64
     files.forEach((file) => {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setImagePreviews((prev) => [...prev, e.target?.result as string]);
+        const dataUrl = e.target?.result as string;
+        setImagePreviews((prev) => [...prev, dataUrl]);
+        // Extract pure base64 (strip data:image/...;base64, prefix)
+        const base64 = dataUrl.split(",")[1] || "";
+        setImageBase64s((prev) => [...prev, base64]);
       };
       reader.readAsDataURL(file);
     });
@@ -58,6 +64,7 @@ export default function NewProjectPage() {
   const removeImage = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
     setImagePreviews(imagePreviews.filter((_, i) => i !== index));
+    setImageBase64s(imageBase64s.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async () => {
@@ -87,22 +94,15 @@ export default function NewProjectPage() {
     scrollToBottom();
 
     try {
-      // Build form data
-      const formData = new FormData();
-      formData.append("brief", trimmed);
-
-      // Derive project name from first ~50 chars of brief
-      const projectName =
-        trimmed.length > 50 ? trimmed.substring(0, 50) + "..." : trimmed;
-      formData.append("projectName", projectName);
-
-      images.forEach((file, i) => {
-        formData.append(`image${i}`, file);
-      });
-
-      const res = await fetch("/api/generate-with-images", {
+      // Call the new raw HTML generation API
+      const res = await fetch("/api/generate-html", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          brief: trimmed,
+          pageType,
+          uploadedImages: imageBase64s.length > 0 ? imageBase64s : undefined,
+        }),
       });
 
       if (!res.ok) {
@@ -110,7 +110,7 @@ export default function NewProjectPage() {
         throw new Error(err.error || "Generation failed");
       }
 
-      const { data, page } = await res.json();
+      const { page } = await res.json();
 
       // Replace thinking message with success
       setMessages((prev) =>
@@ -119,15 +119,15 @@ export default function NewProjectPage() {
             ? {
                 ...m,
                 id: "success",
-                content: `Your landing page is ready! I've created it with ${data.content?.length || 0} sections${images.length > 0 ? ", styled to match your reference screenshots" : ""}. Opening the editor now...`,
+                content: `Your landing page is ready!${images.length > 0 ? " Styled to match your reference screenshots." : ""} Opening the editor now...`,
               }
             : m
         )
       );
 
-      // Redirect to editor with pageId — data is already saved to Supabase by the API
+      // Redirect to HTML editor with pageId
       setTimeout(() => {
-        router.push(`/editor?pageId=${page.id}`);
+        router.push(`/editor-html?pageId=${page.id}`);
       }, 1500);
     } catch (err) {
       // Replace thinking message with error
@@ -214,6 +214,30 @@ export default function NewProjectPage() {
           </div>
         </div>
       )}
+
+      {/* Page Type Selector */}
+      <div className="px-6">
+        <div className="max-w-3xl mx-auto flex gap-2 mb-3">
+          {[
+            { value: "opt-in", label: "Opt-In" },
+            { value: "low-ticket", label: "Low-Ticket" },
+            { value: "vsl", label: "VSL" },
+            { value: "webinar", label: "Webinar" },
+          ].map((t) => (
+            <button
+              key={t.value}
+              onClick={() => setPageType(t.value)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${
+                pageType === t.value
+                  ? "bg-indigo-600 border-indigo-500 text-white"
+                  : "bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-500"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Image Previews */}
       {imagePreviews.length > 0 && (
