@@ -35,20 +35,31 @@ export async function POST(req: Request) {
       maxOutputTokens: 16000,
     });
 
-    // Parse the JSON from the response
+    // Parse JSON — robust extraction handles conversational responses
     const text = result.text.trim();
-    // Try to extract JSON if wrapped in markdown fences
-    const jsonMatch = text.match(/```(?:json)?\n?([\s\S]*?)\n?```/);
-    const jsonStr = jsonMatch ? jsonMatch[1] : text;
+    let pageData: { content: unknown[]; zones?: Record<string, unknown[]>; root: { props: Record<string, unknown> } };
 
-    const pageData = JSON.parse(jsonStr);
+    const fenceMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
+    const braceStart = text.indexOf("{");
+    const braceEnd = text.lastIndexOf("}");
 
-    // Validate basic structure
+    let jsonStr: string;
+    if (fenceMatch) {
+      jsonStr = fenceMatch[1].trim();
+    } else if (braceStart !== -1 && braceEnd > braceStart) {
+      jsonStr = text.substring(braceStart, braceEnd + 1);
+    } else {
+      return NextResponse.json({ error: "No JSON found in AI response" }, { status: 500 });
+    }
+
+    try {
+      pageData = JSON.parse(jsonStr);
+    } catch {
+      return NextResponse.json({ error: "Failed to parse generated JSON" }, { status: 500 });
+    }
+
     if (!pageData.content || !Array.isArray(pageData.content)) {
-      return NextResponse.json(
-        { error: "Generated data is missing content array" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Generated data is missing content array" }, { status: 500 });
     }
 
     // Save to Supabase immediately

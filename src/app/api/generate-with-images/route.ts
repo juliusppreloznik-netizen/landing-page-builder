@@ -77,11 +77,41 @@ ${imageFiles.length > 0 ? `\nCRITICAL: You have been given reference screenshots
       maxOutputTokens: 16000,
     });
 
-    // Parse JSON
+    // Parse JSON — robust extraction handles conversational responses
     const text = result.text.trim();
-    const jsonMatch = text.match(/```(?:json)?\n?([\s\S]*?)\n?```/);
-    const jsonStr = jsonMatch ? jsonMatch[1] : text;
-    const pageData = JSON.parse(jsonStr);
+    let pageData: { content: unknown[]; zones?: Record<string, unknown[]>; root: { props: Record<string, unknown> } };
+
+    // Strategy 1: markdown fences
+    const fenceMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
+    // Strategy 2: find first { to last }
+    const braceStart = text.indexOf("{");
+    const braceEnd = text.lastIndexOf("}");
+
+    let jsonStr: string;
+    if (fenceMatch) {
+      jsonStr = fenceMatch[1].trim();
+    } else if (braceStart !== -1 && braceEnd > braceStart) {
+      jsonStr = text.substring(braceStart, braceEnd + 1);
+    } else {
+      return NextResponse.json({ error: "No JSON found in AI response" }, { status: 500 });
+    }
+
+    try {
+      pageData = JSON.parse(jsonStr);
+    } catch {
+      // If JSON is malformed (truncated), try to salvage by finding the content array
+      const contentMatch = jsonStr.match(/"content"\s*:\s*\[([\s\S]*)\]/);
+      if (contentMatch) {
+        try {
+          const content = JSON.parse(`[${contentMatch[1]}]`);
+          pageData = { content, root: { props: {} } };
+        } catch {
+          return NextResponse.json({ error: "Failed to parse generated JSON" }, { status: 500 });
+        }
+      } else {
+        return NextResponse.json({ error: "Failed to parse generated JSON" }, { status: 500 });
+      }
+    }
 
     if (!pageData.content || !Array.isArray(pageData.content)) {
       return NextResponse.json({ error: "Invalid generated structure" }, { status: 500 });
