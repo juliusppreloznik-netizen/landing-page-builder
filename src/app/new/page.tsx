@@ -125,12 +125,9 @@ export default function NewProjectPage() {
         )
       );
 
-      // Store data and redirect to editor
-      sessionStorage.setItem("generatedPageData", JSON.stringify(data));
-      sessionStorage.setItem("generatedPageId", page.id);
-
+      // Redirect to editor with pageId — data is already saved to Supabase by the API
       setTimeout(() => {
-        router.push("/editor?source=generated");
+        router.push(`/editor?pageId=${page.id}`);
       }, 1500);
     } catch (err) {
       // Replace thinking message with error

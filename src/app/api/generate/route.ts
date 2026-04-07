@@ -3,6 +3,7 @@ import { generateText } from "ai";
 import { NextResponse } from "next/server";
 import { buildSkillsPrompt } from "@/lib/skills";
 import { COMPONENT_SCHEMA } from "@/lib/component-schema";
+import { createClient } from "@/lib/supabase/server";
 
 export const maxDuration = 60;
 
@@ -48,6 +49,37 @@ export async function POST(req: Request) {
         { error: "Generated data is missing content array" },
         { status: 500 }
       );
+    }
+
+    // Save to Supabase immediately
+    const supabase = await createClient();
+    const projectName = brief.length > 50 ? brief.substring(0, 50) + "..." : brief;
+
+    const { data: project } = await supabase
+      .from("projects")
+      .insert({ name: projectName })
+      .select()
+      .single();
+
+    if (project) {
+      const { data: page } = await supabase
+        .from("pages")
+        .insert({
+          project_id: project.id,
+          title: projectName,
+          slug: projectName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+        })
+        .select()
+        .single();
+
+      if (page) {
+        await supabase.from("page_versions").insert({
+          page_id: page.id,
+          content_json: pageData,
+        });
+
+        return NextResponse.json({ data: pageData, project, page });
+      }
     }
 
     return NextResponse.json({ data: pageData });
