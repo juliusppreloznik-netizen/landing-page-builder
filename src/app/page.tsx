@@ -20,7 +20,13 @@ export default function HomePage() {
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
-  const [creating, setCreating] = useState(false);
+
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [projectName, setProjectName] = useState("");
+  const [pastedHtml, setPastedHtml] = useState("");
+  const [modalError, setModalError] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const fetchProjects = async () => {
     try {
@@ -38,13 +44,7 @@ export default function HomePage() {
     fetchProjects();
   }, []);
 
-  const handleNewProject = () => {
-    // Navigate to the new project chat flow
-    router.push("/new");
-  };
-
   const handleOpenProject = async (pageId: string) => {
-    // Check if the latest version is raw_html type
     try {
       const res = await fetch(`/api/pages?id=${pageId}`);
       const { version } = await res.json();
@@ -60,7 +60,6 @@ export default function HomePage() {
     e.stopPropagation();
     if (!confirm("Delete this project?")) return;
 
-    // Delete pages and versions first (cascading), then project
     const project = projects.find((p) => p.id === projectId);
     if (project) {
       for (const page of project.pages) {
@@ -69,6 +68,56 @@ export default function HomePage() {
     }
     await fetch(`/api/projects?id=${projectId}`, { method: "DELETE" });
     setProjects(projects.filter((p) => p.id !== projectId));
+  };
+
+  const handleLoadIntoEditor = async () => {
+    setModalError("");
+
+    if (!projectName.trim()) {
+      setModalError("Project name is required.");
+      return;
+    }
+    if (!pastedHtml.trim()) {
+      setModalError("Please paste your HTML content.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      // Create project
+      const projRes = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: projectName.trim() }),
+      });
+      const { project, page } = await projRes.json();
+
+      if (!project || !page) {
+        setModalError("Failed to create project.");
+        setSaving(false);
+        return;
+      }
+
+      // Save pasted HTML as a page version
+      await fetch("/api/pages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pageId: page.id,
+          contentJson: {
+            type: "raw_html",
+            html: pastedHtml,
+            generatedAt: new Date().toISOString(),
+          },
+        }),
+      });
+
+      // Redirect to HTML editor
+      router.push(`/editor-html?pageId=${page.id}`);
+    } catch {
+      setModalError("Something went wrong. Please try again.");
+      setSaving(false);
+    }
   };
 
   const formatDate = (dateStr: string) => {
@@ -98,9 +147,13 @@ export default function HomePage() {
             </p>
           </div>
           <button
-            onClick={handleNewProject}
-            disabled={creating}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold px-5 py-3 rounded-lg transition-colors"
+            onClick={() => {
+              setShowModal(true);
+              setProjectName("");
+              setPastedHtml("");
+              setModalError("");
+            }}
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-3 rounded-lg transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -125,9 +178,14 @@ export default function HomePage() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-slate-300 mb-2">No projects yet</h3>
-            <p className="text-slate-500 mb-6">Create your first AI-powered landing page</p>
+            <p className="text-slate-500 mb-6">Paste your HTML to start editing</p>
             <button
-              onClick={handleNewProject}
+              onClick={() => {
+                setShowModal(true);
+                setProjectName("");
+                setPastedHtml("");
+                setModalError("");
+              }}
               className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
             >
               Create Your First Project
@@ -149,7 +207,6 @@ export default function HomePage() {
                   onClick={() => page && handleOpenProject(page.id)}
                   className="group bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-indigo-500/50 hover:bg-slate-800/50 transition-all cursor-pointer"
                 >
-                  {/* Preview placeholder */}
                   <div className="bg-slate-800 rounded-lg h-36 mb-4 flex items-center justify-center overflow-hidden">
                     <div className="text-center">
                       <div className="w-10 h-10 mx-auto mb-2 bg-slate-700 rounded-lg flex items-center justify-center">
@@ -191,6 +248,82 @@ export default function HomePage() {
           </div>
         )}
       </div>
+
+      {/* NEW PROJECT MODAL */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-2xl mx-4 flex flex-col" style={{ maxHeight: "90vh" }}>
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
+              <h2 className="text-lg font-semibold text-white">New Project</h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="p-1 text-slate-500 hover:text-white transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="px-6 py-5 flex-1 overflow-y-auto space-y-4">
+              {/* Project Name */}
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                  Project Name
+                </label>
+                <input
+                  type="text"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  placeholder="e.g. Credit Repair Opt-In Page"
+                  className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                />
+              </div>
+
+              {/* HTML Paste Area */}
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                  HTML Content
+                </label>
+                <textarea
+                  value={pastedHtml}
+                  onChange={(e) => setPastedHtml(e.target.value)}
+                  placeholder="Paste your full HTML here..."
+                  className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm font-mono resize-none"
+                  style={{ minHeight: 400 }}
+                />
+              </div>
+
+              {/* Error */}
+              {modalError && (
+                <div className="bg-red-900/30 border border-red-800 rounded-lg px-4 py-2.5 text-red-300 text-sm">
+                  {modalError}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t border-slate-700">
+              <button
+                onClick={handleLoadIntoEditor}
+                disabled={saving}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                {saving ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  "Load into Editor"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
